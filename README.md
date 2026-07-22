@@ -1,5 +1,5 @@
 # League of Legends Stats Tracker
-![Version](https://shields.io)
+**Project State:** Version 1.0.0-Alpha
 
 A Java and Spring Boot application that interacts with the Riot Games API to retrieve player profiles, match histories, and compute performance metrics.
 
