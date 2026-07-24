@@ -7,6 +7,12 @@ public class PlayerStatsSummary {
     private double averageKills;
     private double averageDeaths;
     private double averageAssists;
+    private double averageCsPerMin;
+    private double averageVisionScore;
+    private double averageControlWardsBought;
+    private double averageWardsPlaced;
+    private double averageWardsDestroyed;
+    private double averageKillParticipation;
 
     public int getGamesPlayed() {
         return gamesPlayed;
@@ -48,5 +54,47 @@ public class PlayerStatsSummary {
     }
     public void setAverageAssists(double averageAssists) {
         this.averageAssists = averageAssists;
+    }
+
+    public double getAverageCsPerMin() {
+        return averageCsPerMin;
+    }
+    public void setAverageCsPerMin(double averageCsPerMin) {
+        this.averageCsPerMin = averageCsPerMin;
+    }
+
+    public double getAverageVisionScore() {
+        return averageVisionScore;
+    }
+    public void setAverageVisionScore(double averageVisionScore) {
+        this.averageVisionScore = averageVisionScore;
+    }
+
+    public double getAverageControlWardsBought() {
+        return averageControlWardsBought;
+    }
+    public void setAverageControlWardsBought(double averageControlWardsBought) {
+        this.averageControlWardsBought = averageControlWardsBought;
+    }
+
+    public double getAverageWardsPlaced() {
+        return averageWardsPlaced;
+    }
+    public void setAverageWardsPlaced(double averageWardsPlaced) {
+        this.averageWardsPlaced = averageWardsPlaced;
+    }
+
+    public double getAverageWardsDestroyed() {
+        return averageWardsDestroyed;
+    }
+    public void setAverageWardsDestroyed(double averageWardsDestroyed) {
+        this.averageWardsDestroyed = averageWardsDestroyed;
+    }
+
+    public double getAverageKillParticipation() {
+        return averageKillParticipation;
+    }
+    public void setAverageKillParticipation(double averageKillParticipation) {
+        this.averageKillParticipation = averageKillParticipation;
     }
 }

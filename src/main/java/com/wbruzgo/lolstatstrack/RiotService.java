@@ -35,7 +35,7 @@ public class RiotService {
                 .uri(url)
                 .header("X-Riot-Token", apiKey)
                 .retrieve()
-                .body(new ParameterizedTypeReference<List<String>>() {});
+                .body(new ParameterizedTypeReference<>() {});
     }
 
     public MatchDetails getMatchDetails(String matchId) {
@@ -51,37 +51,53 @@ public class RiotService {
                 .body(MatchDetails.class);
     }
 
+    //creating a record to store all game stats instead of updating each one individually
+    private record  GameStats(
+            boolean win, int kills, int deaths, int assists,
+            double csPerMin, int visionScore, int controlWards,
+            int wardsPlaced, int wardsKilled, double killParticipation
+    ) {}
+
     public PlayerStatsSummary getPlayerStatsSummary(String puuid, int numberOfGames) {
         List<String> matchIds = getMatchIds(puuid, numberOfGames);
 
-        int wins = 0;
-        int totalKills = 0;
-        int totalDeaths = 0;
-        int totalAssists = 0;
+        List<GameStats> games = matchIds.stream()
+                .map(matchId -> {
+                    MatchDetails match = getMatchDetails(matchId);
+                    long gameDurationSeconds = match.getInfo().getGameDuration();
 
-        for (String matchId : matchIds) {
-            MatchDetails match = getMatchDetails(matchId);
+                    MatchDetails.Participant p = match.getInfo().getParticipants().stream()
+                            .filter(participant -> participant.getPuuid().equals(puuid))
+                            .findFirst()
+                            .orElseThrow();
 
-            MatchDetails.Participant me = match.getInfo().getParticipants().stream()
-                    .filter(p -> p.getPuuid().equals(puuid))
-                    .findFirst()
-                    .orElseThrow();
+                    int cs = p.getTotalMinionsKilled() + p.getNeutralMinionsKilled();
+                    double csPerMin = cs / (gameDurationSeconds / 60.0);
 
-            if (me.isWin()) {
-                wins++;
-            }
-            totalKills += me.getKills();
-            totalDeaths += me.getDeaths();
-            totalAssists += me.getAssists();
-        }
+                    return new GameStats(
+                            p.isWin(), p.getKills(), p.getDeaths(), p.getAssists(),
+                            csPerMin, p.getVisionScore(), p.getVisionWardsBoughtInGame(),
+                            p.getWardsPlaced(), p.getWardsKilled(), p.getChallenges().getKillParticipation()
+                    );
+                })
+                .toList();
 
         PlayerStatsSummary summary = new PlayerStatsSummary();
-        summary.setGamesPlayed(matchIds.size());
-        summary.setWins(wins);
-        summary.setLosses(matchIds.size() - wins);
-        summary.setAverageKills((double) totalKills / matchIds.size());
-        summary.setAverageDeaths((double) totalDeaths / matchIds.size());
-        summary.setAverageAssists((double) totalAssists / matchIds.size());
+        int gamesPlayed = games.size();
+        long wins = games.stream().filter(GameStats::win).count();
+
+        summary.setGamesPlayed(gamesPlayed);
+        summary.setWins((int) wins);
+        summary.setLosses(gamesPlayed - (int) wins);
+        summary.setAverageKills(games.stream().mapToInt(GameStats::kills).average().orElse(0));
+        summary.setAverageDeaths(games.stream().mapToInt(GameStats::deaths).average().orElse(0));
+        summary.setAverageAssists(games.stream().mapToInt(GameStats::assists).average().orElse(0));
+        summary.setAverageCsPerMin(games.stream().mapToDouble(GameStats::csPerMin).average().orElse(0));
+        summary.setAverageVisionScore(games.stream().mapToInt(GameStats::visionScore).average().orElse(0));
+        summary.setAverageControlWardsBought(games.stream().mapToInt(GameStats::controlWards).average().orElse(0));
+        summary.setAverageWardsPlaced(games.stream().mapToInt(GameStats::wardsPlaced).average().orElse(0));
+        summary.setAverageWardsDestroyed(games.stream().mapToInt(GameStats::wardsKilled).average().orElse(0));
+        summary.setAverageKillParticipation(games.stream().mapToDouble(GameStats::killParticipation).average().orElse(0));
 
         return summary;
     }
