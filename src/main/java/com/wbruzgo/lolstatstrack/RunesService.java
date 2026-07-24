@@ -9,6 +9,17 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+/**
+ * Resolves numeric Riot rune/tree/shard IDs (as seen on
+ * {@link MatchDetails.Participant.Perks}) into their display names.
+ * <p>
+ *     Rune and tree names are loaded once at startup from Riot's Data Dragon
+ *     static assets - a separate, unauthenticated host from the live match-v5
+ *     API, versioned per patch. Stat shard names are <b>not</b> included in
+ *     Data Dragon's rune data, so they're maintained as a small hardcoded map
+ *     instead.
+ * </p>
+ */
 @Service
 public class RunesService {
 
@@ -16,6 +27,11 @@ public class RunesService {
     private final Map<Integer, String> runeNamesById = new HashMap<>();
     private final Map<Integer, String> treeNamesById = new HashMap<>();
 
+    /**
+     * Maps stat shard IDs to display names. Not sourced from Data Dragon -
+     * shards aren't part of {@code runesReforged.json} - so this is
+     * maintained by hand. Shard IDs are stable and rarely change.
+     */
     private static final Map<Integer, String> SHARD_NAMES = Map.of(
             5008, "Adaptive Force",
             5005, "Attack Speed",
@@ -25,6 +41,15 @@ public class RunesService {
             5001, "Health Scaling"
     );
 
+    /**
+     * Fetches the current patch's rune tree data from Data Dragon and
+     * populates {@link #runeNamesById} and {@link #treeNamesById}.
+     * <p>
+     *     Runs once at application startup. If Data Dragon is unreachable at
+     *     that point, startup fails - tradeoff for a personal project to not need
+     *     null-checks/lazy-loading logic on every lookup.
+     * </p>
+     */
     @PostConstruct
     public void loadRuneData() {
         String latestVersion = restClient.get()
@@ -48,18 +73,45 @@ public class RunesService {
         }
     }
 
+    /**
+     * Resolves a specific rune's ID (e.g. the keystone or a minor rune) to
+     * its display name.
+     *
+     * @param perkId the rune ID, as returned in a {@code PerkSelection}
+     * @return the rune's name, or {@code "Unknown Rune"} if not found.
+     */
     public String getRuneName(int perkId) {
         return runeNamesById.getOrDefault(perkId, "Unknown Rune");
     }
 
+    /**
+     *  Resolves a rune tree's ID (e.g. Domination, Resolve) to its display name.
+     *
+     * @param styleId the tree ID, as returned in a {@code PerkStyle}
+     * @return the tree's name, or {@code "Unknown Tree"} if not found
+     */
     public String getTreeName(int styleId) {
         return treeNamesById.getOrDefault(styleId, "Unknown Tree");
     }
 
+    /**
+     * Resolves a stat shard's ID to its display name.
+     *
+     * @param shardId the shard ID, as returned in {@code StatPerks}
+     * @return the shard's name, or {@code "Unknown Shard"} if not found
+     */
     public String getShardName(int shardId) {
         return SHARD_NAMES.getOrDefault(shardId, "Unknown Shard");
     }
 
+    /**
+     * Builds a fully-resolved {@link RunePageView} — primary and secondary
+     * tree names, their selected rune names, and all three stat shard
+     * names — from a match participant's raw {@link MatchDetails.Participant.Perks}.
+     *
+     * @param perks the participant's raw perks data from a match
+     * @return a {@link RunePageView} with every ID resolved to a display name
+     */
     public RunePageView resolveRunePage(MatchDetails.Participant.Perks perks){
         RunePageView view = new RunePageView();
 

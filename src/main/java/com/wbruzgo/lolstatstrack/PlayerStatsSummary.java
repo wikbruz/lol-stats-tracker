@@ -1,5 +1,9 @@
 package com.wbruzgo.lolstatstrack;
 
+/**
+ * Aggregated stats across a player's recent matches showing average K/D/A,
+ * CS/min, vision score, wards bought, kill participation.
+ */
 public class PlayerStatsSummary {
     private int gamesPlayed;
     private int wins;

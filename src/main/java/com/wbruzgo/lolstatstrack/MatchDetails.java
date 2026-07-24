@@ -2,12 +2,18 @@ package com.wbruzgo.lolstatstrack;
 
 import java.util.List;
 
+/**
+ * Mirror's Riot's match v-5 {@code /matches/{matchId}} response.
+ */
 public class MatchDetails {
     private Info info;
 
     public Info getInfo() { return info; }
     public void setInfo(Info info) {this.info = info; }
 
+    /**
+     * Match-wide data - duration and all participants
+     */
     public static class Info {
         private long gameDuration;
         private List<Participant> participants;
@@ -21,8 +27,14 @@ public class MatchDetails {
         public void setParticipants(List<Participant> participants) {this.participants = participants;}
     }
 
+    /**
+     * An individual player's stats and selections for one match
+     */
     public static class Participant {
 
+        /**
+         * Player's full rune page.
+         */
         public static class Perks {
             private StatPerks statPerks;
             private List<PerkStyle> styles;
@@ -42,6 +54,10 @@ public class MatchDetails {
             }
         }
 
+        /**
+         * Three stat shard IDs chosen.
+         * Resolved to display names via {@link RunesService#getShardName}.
+         */
         public static class StatPerks {
             private int offense, flex, defense;
 
@@ -67,6 +83,11 @@ public class MatchDetails {
             }
         }
 
+        /**
+         * One rune tree selection - can be from primary or secondary tree,
+         * identified by {@link #description} ({@code "primaryStyle"} or
+         * {@code "subStyle"}).
+         */
         public static class PerkStyle {
             private String description;
             private int style;
@@ -94,6 +115,9 @@ public class MatchDetails {
             }
         }
 
+        /**
+         * A single chosen rune within a {@link PerkStyle}.
+         */
         public static class PerkSelection {
             private  int perk;
 
@@ -105,6 +129,10 @@ public class MatchDetails {
             }
         }
 
+        /**
+         * Derived stats not present on the raw participant fields,
+         * computed by Riot (such as kill participation).
+         */
         public static class Challenges {
             private double killParticipation;
 

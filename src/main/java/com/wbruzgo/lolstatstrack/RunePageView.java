@@ -2,6 +2,10 @@ package com.wbruzgo.lolstatstrack;
 
 import java.util.List;
 
+/**
+ * Resolved rune page - tree and rune display names ready for output.
+ * Built from a raw {@link MatchDetails.Participant.Perks} via {@link RunesService#resolveRunePage}.
+ */
 public class RunePageView {
     private String primaryTreeName;
     private List<String> primaryRuneNames;

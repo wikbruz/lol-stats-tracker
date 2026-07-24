@@ -1,5 +1,9 @@
 package com.wbruzgo.lolstatstrack;
 
+/**
+ * Combined response for a single match with raw participant stats
+ * from Riot paired with the resolved rune page for that same participant.
+ */
 public class MatchStatsView {
     private MatchDetails.Participant participant;
     private RunePageView runes;

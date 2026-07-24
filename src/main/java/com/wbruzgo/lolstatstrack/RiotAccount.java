@@ -1,11 +1,13 @@
 package com.wbruzgo.lolstatstrack;
 
+/**
+ * Mirrors riot's account-v1 {@code /accounts/by-riot-id/{gameName}/{tagLine}} response.
+ */
 public class RiotAccount {
     private String puuid;
     private String gameName;
     private String tagLine;
 
-    //getters and setters
     public String getPuuid() { return puuid; }
     public void setPuuid(String puuid) { this.puuid = puuid; }
 

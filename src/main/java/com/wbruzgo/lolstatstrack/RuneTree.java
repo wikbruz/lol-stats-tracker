@@ -2,12 +2,19 @@ package com.wbruzgo.lolstatstrack;
 
 import java.util.List;
 
+/**
+ * Mirrors a single rune tree from data Dragon's {@code runesReforged.json}.
+ * it's {@code id} corresponds to the {@code style} field on {@link MatchDetails.Participant.PerkStyle}.
+ */
 public class RuneTree {
     private int id;
     private String key;
     private String name;
     private List<Slot> slots;
 
+    /**
+     * One row within a rune tree, containing the choices of rune available for that row.
+     */
     public static class Slot {
         private List<Rune> runes;
 
@@ -19,10 +26,13 @@ public class RuneTree {
         }
     }
 
+    /**
+     * A single, individual rune. This sits at a different level of the
+     * tree structure than {@link RuneTree} itself, thus needing to be looked up
+     * separately. Its {@code id} corresponds to the {@code perk} field on
+     * {@link MatchDetails.Participant.PerkSelection}, not the {@code style} field.
+     */
     public static class Rune {
-        /*These values sit at diff levels of the tree structure
-        * and need to be looked up separately. The variables here
-        * are for each individual rune in a rune tree*/
         private int id;
         private String key;
         private String name;
